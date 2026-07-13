@@ -15,10 +15,12 @@ przed pierwszym użyciem zainstaluj LFS: <https://git-lfs.com>
 
 ---
 
-Gramy na **dedykowanym serwerze Bedrock** (`bedrock_server.exe`). Świat siedzi
-w archiwum `.mcworld`, a skrypty `import.ps1` / `export.ps1` rozpakowują go do
-`worlds/` serwera i pakują z powrotem. W `server.properties` musisz mieć
-`level-name=RychuP`.
+Gramy w kliencie **Minecraft for Windows (Bedrock)**. Świat siedzi w archiwum
+`.mcworld`, a skrypty `import.ps1` / `export.ps1` **same znajdują świat po nazwie**
+w zapisach gry (`levelname.txt == RychuP`) — nie trzeba niczego konfigurować.
+
+> ⚠️ **Zamknij Minecrafta** przed uruchomieniem któregokolwiek skryptu — inaczej
+> pliki świata są zablokowane. Skrypty to sprawdzają i przerwą, jeśli gra działa.
 
 ## Jak zacząć grać (pobranie najnowszej wersji)
 
@@ -31,22 +33,23 @@ cd MC-world
 # kolejne razy — tylko odśwież:
 git pull
 
-# rozpakuj świat do serwera (podaj ścieżkę do folderu z bedrock_server.exe):
-.\import.ps1 -ServerPath "C:\bedrock-server"
+# wgraj świat do gry (Minecraft musi być zamknięty):
+.\import.ps1
 ```
 
-Potem odpal `bedrock_server.exe` i graj. Skrypt robi kopię poprzedniego świata
-na serwerze jako `worlds\RychuP.bak`, więc nic nie zginie.
+Potem odpal Minecrafta — świat **RychuP** będzie na liście. Przy pierwszym imporcie
+skrypt tworzy nowy świat; przy kolejnych podmienia istniejący, a jego poprzednią
+wersję odkłada do `.world-backup\` (poza folderem gry, żeby nie robić duplikatu).
 
 ## Po sesji (wrzucenie nowej wersji)
 
-**Najpierw zatrzymaj serwer** (inaczej pliki bazy są zablokowane), potem:
+**Najpierw zamknij Minecrafta**, potem:
 
 ```powershell
-.\export.ps1 -ServerPath "C:\bedrock-server"    # pakuje świat z serwera do RychuP.mcworld
+.\export.ps1            # pakuje świat z gry do RychuP.mcworld
 git add RychuP.mcworld
 git commit -m "Sesja <twoje imię> <data> — co się wydarzyło"
-git pull --no-rebase     # dociągnij, gdyby ktoś coś wrzucił w międzyczasie
+git pull --no-rebase    # dociągnij, gdyby ktoś coś wrzucił w międzyczasie
 git push
 ```
 
@@ -54,4 +57,7 @@ Jeśli `git push` odrzuci zmiany — znaczy, że ktoś wrzucił nowszą wersję.
 **Nie nadpisuj na siłę** — dogadajcie się, czyja sesja jest ważniejsza.
 
 > Jeśli Windows blokuje uruchomienie skryptu, odpal go tak:
-> `powershell -ExecutionPolicy Bypass -File .\import.ps1 -ServerPath "C:\bedrock-server"`
+> `powershell -ExecutionPolicy Bypass -File .\import.ps1`
+>
+> Gdyby skrypt nie znalazł świata (nietypowa instalacja), podaj folder ręcznie:
+> `.\import.ps1 -WorldsPath "...\com.mojang\minecraftWorlds"`
