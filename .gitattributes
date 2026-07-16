@@ -1,1 +1,4 @@
 *.mcworld filter=lfs diff=lfs merge=lfs -text
+
+# Skrypty PowerShella trzymamy z koncami linii CRLF (Windows) - wycisza ostrzezenia Gita.
+*.ps1 text eol=crlf
