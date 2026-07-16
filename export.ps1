@@ -22,10 +22,18 @@ $src   = Find-WorldFolder $roots $WorldName
 if (-not $src) { throw "Nie znalazlem swiata '$WorldName' - zagraj w niego raz albo zrob najpierw import." }
 
 $out = Join-Path $PSScriptRoot "RychuP.mcworld"
-if (Test-Path $out) { Remove-Item $out -Force }
+
+# Compress-Archive akceptuje tylko rozszerzenie .zip - pakujemy do tymczasowego .zip,
+# a dopiero potem podmieniamy na .mcworld. Stary plik kasujemy DOPIERO po udanym spakowaniu,
+# zeby ewentualny blad nie zostawil repo bez swiata.
+$tmp = "$out.zip"
+if (Test-Path $tmp) { Remove-Item $tmp -Force }
 
 # pakujemy ZAWARTOSC folderu (db\, level.dat, ...) do korzenia archiwum - tak wyglada .mcworld
-Compress-Archive -Path (Join-Path $src "*") -DestinationPath $out -CompressionLevel Optimal
+Compress-Archive -Path (Join-Path $src "*") -DestinationPath $tmp -CompressionLevel Optimal
+
+if (Test-Path $out) { Remove-Item $out -Force }
+Move-Item $tmp $out -Force
 
 $size = "{0:N1} MB" -f ((Get-Item $out).Length / 1MB)
 Write-Host "OK. Zapisano $out ($size) ze swiata:" -ForegroundColor Green
